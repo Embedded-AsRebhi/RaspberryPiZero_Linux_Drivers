@@ -1,6 +1,9 @@
+#  Linux Kernel Driver for LED 
+This Linux kernel module implements a platform driver and exposes a miscellaneous character device interface for controlling LED devices.
+
 # Features
 
-- Platform driver bound via Device Tree using the compatible string:  
+- Platform driver bound via Device Tree using the compatible :  
   `" compatible = "Comp,mygpio"; "`
 
 # Hardware Interface
