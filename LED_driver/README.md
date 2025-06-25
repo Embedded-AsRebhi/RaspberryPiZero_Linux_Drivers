@@ -30,4 +30,4 @@ led@2 {
   - `echo 1 > /dev/led` → **Turns OFF** the LED
 
 - To read the current state of the LED:
-  cat /dev/led
+  - `cat /dev/led`
