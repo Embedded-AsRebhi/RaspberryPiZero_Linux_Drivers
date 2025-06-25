@@ -1,4 +1,4 @@
-#  Linux Kernel Driver for LED 
+#  Linux Kernel Driver for DHT11 
 This kernel module implements a platform driver and a misc character device to interface with a DHT11 temperature and humidity sensor using the GPIO descriptor API (gpiod)available in Linux kernel 6.12 and above.
 
 # Features
