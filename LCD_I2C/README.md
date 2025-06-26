@@ -27,3 +27,44 @@ sudo ./lcd_test
   * To enable cursor, use lcd.enableCursor(), or lcd.enableCursor(true)
 
   * To disable cursor, use lcd.enableCursor(false)
+
+# 🧠 Understanding PCF8574  Pinout
+
+- The PCF8574 I2C I/O expander has a fixed base address of 0x20.
+- To allow multiple devices on the same I2C bus, it uses three address pins:
+
+ * A0, A1, A2: Logic inputs that define the full I2C address.
+ * These form the 3 least significant bits of the I2C address.
+
+ * This allows up to 8 different PCF8574 modules on the same I2C bus.
+###  PCF8574 Address Table
+
+| A2 | A1 | A0 | I2C Address (hex) |
+|----|----|----|-------------------|
+|  0 |  0 |  0 | `0x20`            |
+|  0 |  0 |  1 | `0x21`            |
+|  0 |  1 |  0 | `0x22`            |
+|  0 |  1 |  1 | `0x23`            |
+|  1 |  0 |  0 | `0x24`            |
+|  1 |  0 |  1 | `0x25`            |
+|  1 |  1 |  0 | `0x26`            |
+|  1 |  1 |  1 | `0x27`            |
+
+# 🔍 Checking the I2C Address
+
+- To ensure the correct I2C address of your device, follow these steps:
+1. Install the i2c-tools package:
+```dts
+sudo apt install i2c-tools
+```
+2. List all accessible I2C buses:
+
+```dts
+i2cdetect -l
+```
+
+3. Scan the devices connected to a specific I2C bus (typically bus 1 on Raspberry Pi):
+```dts
+i2cdetect -y 1
+```
+- The detected address will be between 0x20 and 0x27 
