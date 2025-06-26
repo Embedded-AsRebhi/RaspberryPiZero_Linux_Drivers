@@ -83,7 +83,7 @@ static ssize_t start_measure(struct mydev_misc_t *dev) {
     return 0;
 }
 
-
+// read function to to start the measure and write the value under the file device /dev/ultrasonic
 static ssize_t my_read(struct file *filp, char __user *buf, size_t count, loff_t *ppos) {
     struct mydev_misc_t *dev = container_of(filp->private_data, struct mydev_misc_t, miscdev);
     char kbuf[32];
@@ -118,6 +118,7 @@ static const struct file_operations my_fops = {
     .read = my_read,
     
 };
+// probe function to save the device 
 
 static int ultrasonic_probe(struct platform_device *pdev) {
     int ret;
@@ -194,7 +195,7 @@ static int ultrasonic_probe(struct platform_device *pdev) {
     pr_info("Driver %s initialise avec IRQ\n", mydev->device_name);
     return 0;
 }
-
+// remove function to remove the device driver
 static void ultrasonic_remove(struct platform_device *pdev) {
     struct mydev_misc_t *misc_dev = platform_get_drvdata(pdev);
 
