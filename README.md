@@ -27,14 +27,14 @@ These drivers are developed as part of a smart home system using various sensors
 ```dts
 git clone https://github.com/Embedded-AsRebhi/RaspberryPiZero_Linux_Drivers.git
 ```
-* For each Driver you should :
-2. Compile each driver
+For each Driver you should :
+### 2. Compile each driver
 
 - Each driver must be recompiled individually to generate a .ko kernel module.
 
-3. Makefile Used for Cross-Compilation
+### 3. Makefile Used for Cross-Compilation
 
-* Example Makefile:
+* Example of Makefile:
 ```dts
 obj-m := module.o
 KERNEL_DIR ?= $(HOME)/Linux_drivers_programmation_noyau/rpi0b32/linux
@@ -49,18 +49,18 @@ deploy:
 	scp *.ko rpiname@ipadress:/home/
 ```
 
-4. Load the module on Raspberry Pi
+### 4. Load the module on Raspberry Pi
 ```dts
 sudo insmod driver.ko
 ```
 
-5. Verify driver insertion
+### 5. Verify driver insertion
 
  * Use dmesg to check kernel logs
 
  * check /proc/devices and /dev/
 
-6. Remove the module
+### 6. Remove the module
 
 ```dts
 sudo rmmod driver
