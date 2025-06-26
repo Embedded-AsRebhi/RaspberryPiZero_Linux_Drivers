@@ -47,10 +47,11 @@ This Linux kernel module implements a platform driver and exposes a miscellaneou
 
   * Wait before next measurement:
   * Wait at least 60 ms before starting a new measurement for reliable results.
-  
+
 # Device Tree 
 
 ```dts
+soc {
 	ultrasonic {
 			compatible = "comp,ultrasonic";
 			label = "ultrasonic";
@@ -62,7 +63,7 @@ This Linux kernel module implements a platform driver and exposes a miscellaneou
 			interrupts = <6 IRQ_TYPE_EDGE_BOTH>;
 			status = "okay";
 		};
-
+}
 &gpio{
 	echo_ultrasonic: echo_ultrasonic {
 		brcm,pins = <6>;
@@ -72,9 +73,5 @@ This Linux kernel module implements a platform driver and exposes a miscellaneou
 ```
 # Usage
 
-- The driver accepts:
-  - `echo 0 > /dev/led` → **Turns ON** the LED  
-  - `echo 1 > /dev/led` → **Turns OFF** the LED
-
-- To read the current state of the LED:
-  - `cat /dev/led`
+- To read the current distance:
+  - `cat /dev/ultrasonic`
