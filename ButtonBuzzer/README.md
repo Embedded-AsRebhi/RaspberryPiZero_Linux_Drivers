@@ -1,5 +1,5 @@
 #  Linux Kernel Driver for Buzzer and push Button 
-his Linux kernel module provides a platform driver that manages a buzzer and a button via GPIOs, enabling basic sound signaling and input detection. 
+This Linux kernel module provides a platform driver that manages a buzzer and a button via GPIOs, enabling basic sound signaling and input detection. 
 
 # Features
 
@@ -9,7 +9,7 @@ his Linux kernel module provides a platform driver that manages a buzzer and a b
 
 # Hardware Interface
 
-- Requires only an available  GPIO pin.
+- Requires only an available  GPIO and PWM pin.
 - Ensure the GPIO and PWM used are not already taken by another peripheral.
 
 # Device Tree of Button : interruption
