@@ -90,14 +90,17 @@ sudo ./serveur
 ### 2.Launch the client on your PC
 
 - On the client side (your PC), run the Python application that contains the Tkinter interface.
+```dts
+python3 dashboard.py
+```
 
 ### 3.Send requests from the client
-- Through the GUI, you can do a different act as:
-- Request distance values
-- Control the servo motor
-- Get temperature and humidity readings
+- The client requests are simulated using buttons in a Tkinter-based graphical interface, for example: 
+- To get temperature and humidity, simply click on the "Refresh" button.
+- To measure distance, click the "Distance" button.
+- To change the interval for saving temperature and humidity data, you can select a value from a predefined dropdown list.
+- You can also click "Historique" to view a log/history of previous temperature and humidity readings.
 
-* Make sure that both devices (client and server) are on the same network, and that the server IP is correctly set in the client code.
 
 # 🧠 Understanding the Server-Client Logic
 
@@ -108,4 +111,15 @@ I have prepared a diagram that explains the overall logic and interaction steps.
 
   - How requests are sent from the client (PC)
   - How the server (Raspberry Pi) processes them
-![alt text](Messenger_creation_8672B7DE-BBD6-41AC-9EBE-1714E957AEFF.jpeg) 
+ 
+
+
+# 💡Notes 
+
+* Make sure that both devices (client and server) are on the same network, and that the server IP is correctly set in the client code.
+* You can find all the wiring and connection details in the figure: cablage.png.
+* Sometimes, multiple parts of the program try to access a shared resource at the same time so to prevent conflicts and ensure data integrity, I used a mutex to protect these shared resources.
+* I launched parallel threads:
+  - One thread periodically logs temperature and humidity data into a file.
+  - Another thread is responsible for measuring distance continuously.
+* On the other hand, I also prepared a separate program to retrieve the latest temperature and humidity , you can find the source file and more details in the folder LCD_I2c

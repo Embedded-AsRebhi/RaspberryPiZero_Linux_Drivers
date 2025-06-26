@@ -26,7 +26,6 @@ void control_servo(char *buf) ;
 
 //handle les signal 
 // generate the signale to stop :: Ctrl+C 
-
 int lcd_handle;
 void handle_signal(int sig) {
     printf("\nReçu signal %d. Fermeture du serveur...\n", sig);
@@ -39,32 +38,24 @@ int main() {
     signal(SIGTERM, handle_signal);
    
     int temp, hum;
-    char buf[64];  // taille augmentée pour SET_INTERVAL etc.
+    char buf[64]; 
     char dist[8] = {0};
     int len;
     int cli;
-     // Ici on a fait dans un runing pour qu'il accepte plusieur request 
-    //signal(SIGINT, handle_signal);
-
-     // fin de lancement de seveur 
-    // create a thread afin de faire un file.log et enregidtre temp et hum
-        
+    
     pthread_t thread1, threaddist ;
-    pthread_create(&thread1, NULL, log_thread, NULL);
-    pthread_create(&threaddist, NULL, dist_thread, NULL);
-    // Lancer le thread LCD
-    //pthread_create(&thread_lcd, NULL, lcd_display_thread, NULL);
-        
-    //config et lancement de sevserveur 
+    pthread_create(&thread1, NULL, log_thread, NULL); //log thread to save temp and hum
+    pthread_create(&threaddist, NULL, dist_thread, NULL); // thread to controle the distance , if if less than 10 cm , a green leed will turn on alse turn off
+    
+    //Config et launch the serveur 
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
         perror("Erreur socket");
         exit(EXIT_FAILURE);
     }
-    //pour debloqué le port 
+    //This function to free the port after a stop request
     int opt = 1;
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(12345);
@@ -76,11 +67,10 @@ int main() {
     }
 
     // Mettre le serveur en attente d’une connexion
-    // autorise jusqu’à 5 clients en attente (dans la file) s’il n’y a pas encore eu de accept()”.
     listen(sock, 5);
     printf("Serveur en attente de connexion...\n");
 
-   
+   // infinite loop as long as the server is launched
     while (runing) {
 
         cli = accept(sock, NULL, NULL);
@@ -88,9 +78,8 @@ int main() {
             perror("Erreur accept");
             continue;
         }
-        //printf("Client connected\n");
-        // len == 0 : FIN DE FICHIER ou client a fermé le socket 
-        // va lire le request de client
+        
+        // here will wait the command request to launch a suitable structure
         while ((len = read(cli, buf, sizeof(buf) - 1)) > 0) {
             buf[len] = '\0';
             printf("Commande reçue : %s\n", buf);
@@ -102,40 +91,34 @@ int main() {
             } else if (strcmp(buf, "HUM") == 0 || strcmp(buf, "Hum") == 0) {
                 sprintf(buf, "%d", hum);
             } else if (strncmp(buf, "SET_INTERVAL", 12) == 0) {
-                /// buf + 13 saute les 13 premiers caractères pour aller directement au nombre.
-                // sprintf(commandInterval, "SET_INTERVAL %d",new_int);
+            // buf + 13 skips the first 13 characters to go directly to the number
                 int new_interval = atoi(buf + 13);
                 pthread_mutex_lock(&lock);
-                interval_log = new_interval;  // Écriture
+                interval_log = new_interval;  
                 pthread_mutex_unlock(&lock);
                 strcpy(buf, "OK");
             } else if (strcmp(buf, "Histo") == 0) {
                 FILE* log = fopen("dht.log", "r");
                 get_histo(log, cli, buf);
-                //continue;
+            
             } else if (strcmp(buf, "LED") == 0) {
                
                 state_led();
                 strcpy(buf, "OK");
-                //continue;
+                
             } else if (strcmp(buf, "Dist") == 0) {
-               
-                //char dist[32] = {0};
                 if (get_dist(dist) == 0) {
                     write(cli, dist, strlen(dist)); 
                 } else {
                     strcpy(buf, "Erreur lecture distance");
                     write(cli, buf, strlen(buf));
                 }
-                //strcpy(buf, "OK");
-                //continue;
+
             } else if (strcmp(buf, "Serveur") == 0) {
-              
-                //printf("Bye Bye \n");
                 strcpy(buf, "ok\n");
-                write(cli, buf, strlen(buf));  // envoyer une réponse au client
+                write(cli, buf, strlen(buf)); 
                 close(cli);
-                //should_close = 0;  // le close est reporté après la boucle
+                
                 runing = 0;
                 break; // sort de la boucle de communication
             } else if (strcmp(buf, "Servo") == 0) {
@@ -143,29 +126,24 @@ int main() {
             }else {
                 strcpy(buf, "Commande inconnue");
             }
-            
-
-            // envoyer la réponse
+            // send the response
             write(cli, buf, strlen(buf));
         }
     
     close(cli);
-    //printf("Client déconnecté\n");
+    printf("Client déconnecté\n");
     
     }
     
-    //runing =0;
+   
     pthread_join(thread1, NULL);
     pthread_join(threaddist, NULL);
-    //pthread_join(thread_lcd, NULL);
-    //pthread_join(threadservo, NULL);
     close(sock);
-    //pthread_mutex_destroy(&lock);
     pthread_mutex_destroy(&lock_readdist);
     return EXIT_SUCCESS;
 }
 
-//fonction pour allumer led rouge si temp sup a 20 
+//function to turn on the red led if temperature more than 20 
 void set_led(int state){
     int fd =open("/dev/ledrouge", O_WRONLY);
     if(fd == -1){
@@ -179,7 +157,8 @@ void set_led(int state){
         close(fd);
     }
 }
-// lecture de la distance de dev/ultrasonic 
+
+//get the distance from /dev/ultrasonic 
 int get_dist(char *dist) {
 
     pthread_mutex_lock(&lock_readdist);
@@ -199,17 +178,15 @@ int get_dist(char *dist) {
         return -1;
     }
     dist[len] = '\0';
-    //printf("Read %d bytes: %s\n", len, dist);
     return 0;
 }
 
-// Fonction pour allumer led vert si distance inf 10 sinon va fermer 
+//function to turn on the green led if distance less than 10 cm
 void set_leddist(int state){
 
     int fd =open("/dev/ledvert", O_WRONLY);
     if(fd == -1){
         perror("Not possible de open file dist if sup 10\n");
-
     }
     else {
         char cmd = state ? '1' : '0';
@@ -221,41 +198,32 @@ void set_leddist(int state){
 }
 
 
-// Lecture de la température et humidité depuis /dev/dht
-// Format attendu : "30 45" (température humidité)
-
+//Read the temp and Hum from /dev/dht
 int get_Temp_Hum(int *temp, int *hum) {
     int fd = open("/dev/dht", O_RDONLY);
     if (fd == -1) {
         perror("Erreur d'ouverture /dev/dht");
         return -1;
     }
-    char buff[20];  // Assez grand pour contenir "xx yy"
+    char buff[20];  
     int len = read(fd, buff, sizeof(buff) - 1);
     if (len < 0) {
         perror("Erreur de lecture /dev/dht");
         close(fd);
         return -1;
     }
-
     buff[len] = '\0';
-
-    // Extraction des deux valeurs
-    // sscanf lit une data depuis une chaîne de caractères (buff)
-    // sscanf diff de scanf, sscanf lit dans buffer et scanf lit de clavier
     if (sscanf(buff, "%d %d", temp, hum) != 2) {
         fprintf(stderr, "Format invalide dans /dev/dht: %s\n", buff);
         close(fd);
         return -1;
     }
-
     close(fd);
     return 0;
 }
 
 
-// cette fonction pour copie le log file de serveur vers ici .
-
+//This function to copy the log file(temp and hum) from server to the client
 void* log_thread(void* arg) {
     
     while (runing) {
@@ -272,34 +240,28 @@ void* log_thread(void* arg) {
             }
         }
         set_led(temp > 20 ? 1 : 0);
-        // le wait_time peut accéder par le serveur thread et cette thread lui-même.
         pthread_mutex_lock(&lock);
-        int wait_time = interval_log;    // Lecture
-        //sleep(interval_log);  // Dort avec le verrou ! Bloque les autres threads.
+        int wait_time = interval_log;    
         pthread_mutex_unlock(&lock);
         for (int i = 0; i < wait_time && runing; ++i) {
             sleep(1);
         }
-        //sleep(wait_time);
     }
     set_led(0);
     return NULL;
 }
 
-// cette fonction pour controler la led a distance et l'allumer si in esp allumer 
+// this function to turn on or turn off the bleu led from client  
 void state_led(){
     int fd = open("/dev/ledbleu", O_RDWR);
     char state[8]={0}; 
     if (fd == -1 ){
         printf("Error to open file led1\n");
-        //return 0;
     }
-    //printf("file opend\n");
     ssize_t readled2 = read(fd,state,sizeof(state)-1);
     if(readled2 <= 0){
         printf("error de read\n");
         close(fd);   
-        //return 0; 
     }
     state[strcspn(state, "\r\n")] = 0;
     printf("Etat actuel de la LED : %s\n", state);
@@ -311,14 +273,12 @@ void state_led(){
     } else {
         fprintf(stderr, "État LED inconnu : %s\n", state);
         close(fd);
-        //return 0;
     }
  //nettoyer le fichier avant d'ecrire et mettre le cursor en avant 
     lseek(fd, 0, SEEK_SET);
     if (write(fd, new_state, 1) <= 0) {
         perror("Erreur écriture");
         close(fd);
-        //return 0;
     } else {
         printf("LED changed to : %s\n", new_state);
     }
@@ -328,23 +288,20 @@ void state_led(){
 
 
 
-// Affiche l'historique
+// display the historique
 void get_histo(FILE* file, int cli, char* buf) {
     char line[256];
     if (file) {
-        // fgets va lire de fichier log
         while (fgets(line, sizeof(line), file)) {
             write(cli, line, strlen(line));
-            usleep(10000); // petite pause en micro pour ne pas saturer le buffer 
+            usleep(10000);  
     }
     write(cli, "__END__", strlen("__END__"));
     fclose(file);
     } else {
         strcpy(buf, "no histo\n");
-        //buf ne contient plus rien d'utile à ce moment-là,donc il faut ce write 
         write(cli, buf, strlen(buf));
-    }
-    
+    } 
 }
 
 void* dist_thread(void* arg) {
@@ -354,19 +311,17 @@ void* dist_thread(void* arg) {
             int distance = atoi(dist);
             set_leddist(distance < 10 ? 1 : 0);
         }
-        sleep(1);  // Vérifie la distance chaque seconde
+        sleep(1);  
     }
     set_leddist(0);
     return NULL;
 }
-
+ 
+// this function to turn on the servomottor to 160° or 0°
 void control_servo(char *buf) {
-    //pthread_mutex_lock(&lock_servo);
-
-    static int etat_servo = 0;  // fermé 0, ouvert 180
+    static int etat_servo = 0;  // close 0, open 160
     int angle = (etat_servo == 0) ? 160 : 0;
     etat_servo = angle;
-
     int fd = open("/dev/servomotor", O_WRONLY);
     if (fd >= 0) {
         char cmd[8];
@@ -379,5 +334,4 @@ void control_servo(char *buf) {
         strcpy(buf, "Erreur servo");
     }
 
-    //pthread_mutex_unlock(&lock_servo);
 }
