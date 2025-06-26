@@ -14,19 +14,6 @@ This Linux kernel module implements an I2C-based driver to interface with an LCD
   * A potentiometer is connected to adjust and control the LCD backlight brightness.
 - This configuration provides a clean and efficient way to interface an LCD display using minimal GPIOs
 
-# 🚀 Launching the Communication
-```dts
-gcc I2c_lcd.c -o lcd_test -lpigpio
-sudo ./lcd_test
-```
-
-- Make sure the pigpio library is installed and the pigpiod daemon is running before executing the program.
-- This will initiate communication with the LCD over I2C using the PCF8574 module.
-- By default, the display will be on and no cursor is displayed
-
-  * To enable cursor, use lcd.enableCursor(), or lcd.enableCursor(true)
-
-  * To disable cursor, use lcd.enableCursor(false)
 
 # 🧠 Understanding PCF8574  Pinout
 
@@ -53,10 +40,10 @@ sudo ./lcd_test
 - There are two main methods to determine or set the I2C address used by the LCD module:
 
 1. **Manual Configuration via Jumpers (A0, A1, A2)**  
-   The I2C address can be manually set by changing the positions of the A0, A1, and A2 address selection jumpers on the module. Each combination alters the least significant bits of the address, allowing multiple LCDs to be used on the same I2C bus.
+- The I2C address can be manually set by changing the positions of the A0, A1, and A2 address selection jumpers on the module. Each combination alters the least significant bits of the address, allowing multiple LCDs to be used on the same I2C bus.
 
 2. **Automatic Detection Using I2C Tools**  
-  - using the I2C-tools as describing below.
+- Using the I2C-tools as describing below.
 
 # 🔍 Checking the I2C Address
 
@@ -76,6 +63,19 @@ i2cdetect -l
 i2cdetect -y 1
 ```
 - The detected address will be between 0x20 and 0x27 
+# 🚀 Launching the Communication
+```dts
+gcc I2c_lcd.c -o lcd_test -lpigpio
+sudo ./lcd_test
+```
+
+- Make sure the pigpio library is installed and the pigpiod daemon is running before executing the program.
+- This will initiate communication with the LCD over I2C using the PCF8574 module.
+- By default, the display will be on and no cursor is displayed
+
+  * To enable cursor, use lcd.enableCursor(), or lcd.enableCursor(true)
+
+  * To disable cursor, use lcd.enableCursor(false)
 
 # 💡Notes 
 - there are two useful link to more understand the PCF8574 and LCD
