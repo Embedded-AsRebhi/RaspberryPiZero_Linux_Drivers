@@ -32,8 +32,8 @@ soc{
 &gpio{
 	button_pin: key_pin {
 		brcm,pins = <17>;
-		brcm,function = <0>; /* pour forcer comme Input */
-		brcm,pull = <BCM2835_PUD_UP>; //pour marquer qu'on va activer  une resistance pull up
+		brcm,function = <0>; 
+		brcm,pull = <BCM2835_PUD_UP>;  
 	};
 } 
 ```
