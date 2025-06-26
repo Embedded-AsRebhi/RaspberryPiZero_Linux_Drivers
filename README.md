@@ -23,7 +23,7 @@ These drivers are developed as part of a smart home system using various sensors
 
 # Getting Started
 
-1. Clone the repository
+## 1. Clone the repository
 ```dts
 git clone https://github.com/Embedded-AsRebhi/RaspberryPiZero_Linux_Drivers.git
 ```
