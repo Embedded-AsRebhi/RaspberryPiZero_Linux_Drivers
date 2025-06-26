@@ -96,40 +96,6 @@ static ssize_t my_read(struct file *filp, char __user *buf, size_t count, loff_t
     if (ret < 0)
         return ret;
 
-    // Attente de fin de mesure, timeout à 100 ms
-    //measure_wq : c’est la wait queue (file d’attente) sur laquelle le processus va attendre.
-    /*
-    !measuring_in_progress : c’est la condition d’arrêt de l’attente.
-
-    Le processus va dormir tant que cette condition est fausse.
-
-    Ici, il attend que measuring_in_progress soit à 0, donc que la mesure soit finie.
-
-    msecs_to_jiffies(100) : c’est le timeout maximum d’attente, converti en "jiffies" (unités de temps du kernel).
-    
-    */
-    /*
-    Le processus qui appelle wait_event_interruptible_timeout va se mettre en sommeil (ne rien faire) tant que :
-
-    La condition !measuring_in_progress est fausse (c’est-à-dire que measuring_in_progress est toujours vrai, mesure en cours)
-
-    Et que le timeout n’est pas dépassé.
-
-    Si pendant l’attente la condition devient vraie (la mesure est terminée et measuring_in_progress = 0), alors le processus se réveille immédiatement.
-
-    Sinon, il se réveille automatiquement quand le timeout (100 ms ici) est écoulé.
-
-    Si un signal externe interrompt l’attente, la fonction retourne aussi.
-    
-    
-    
-    */
-   /*
-   Si pendant 100 ms l’interruption d’écho ne se produit pas (pas de front descendant),
-
-    la fonction retourne un timeout (-ETIMEDOUT) et le processus my_read() se termine proprement sans rester bloqué
-   
-   */
     ret = wait_event_interruptible_timeout(measure_wq, !measuring_in_progress, msecs_to_jiffies(100));
     if (ret == 0) {
         pr_info("Timeout lors de la lecture de la mesure\n");
@@ -259,4 +225,4 @@ module_platform_driver(ultrasonic_driver);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Asma REBHI");
-MODULE_DESCRIPTION("Driver HC-SR04 avec interruption (comme bouton)");
+MODULE_DESCRIPTION("Driver HC-SR04 avec interruption");
