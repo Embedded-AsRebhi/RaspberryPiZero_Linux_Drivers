@@ -126,7 +126,8 @@ I have prepared two diagrams(digram_serveur.jpeg et diagram_client.png) that exp
   * The server processes the data and sends back a response.
 
   * Both sides close the connection after the exchange is complete.
-- You can see the diagram details in the ![Socket Diagram](./diagram_socket.png) file.
+
+![Socket Diagram](./diagram_socket.png)
 
 
 # 💡Notes 
