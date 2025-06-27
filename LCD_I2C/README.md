@@ -4,7 +4,7 @@ This Linux kernel module implements an I2C-based driver to interface with an LCD
 # 🖥️ LCD with I2C Communication
 
 - To minimize the number of GPIO pins used for communication between the LCD and the Raspberry Pi, I used the PCF8574 I/O expander, which enables communication via the I2C protocol.
-- You can find the detailed wiring in the figure: LCD_Raspberry.png.
+- You can find the detailed wiring in the figure: [LCD_Raspberry](LCD_Raspberry.png).
 
 - In this setup:
 
