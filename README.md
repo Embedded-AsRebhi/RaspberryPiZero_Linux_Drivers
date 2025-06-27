@@ -105,13 +105,28 @@ python3 dashboard.py
 # 🧠 Understanding the Server-Client Logic
 
 - To better understand the communication flow between the server and the client,
-I have prepared a diagram that explains the overall logic and interaction steps.
+I have prepared two diagrams(digram_serveur.jpeg et diagram_client.png) that explain the overall logic and interaction steps.
 
 - This visual representation helps clarify:
 
   - How requests are sent from the client (PC)
   - How the server (Raspberry Pi) processes them
  
+### TCP Socket Communication
+- I used TCP socket communication to establish a reliable connection between the client and the server. 
+- TCP (Transmission Control Protocol) socket communication is a standard method for enabling two devices ( a client and a server) to exchange data over a network.
+#### Steps:
+
+  * The client creates a socket and connects to the server's IP and port.
+
+  * The server accepts the incoming connection.
+
+  * The client sends data (e.g., a request).
+
+  * The server processes the data and sends back a response.
+
+  * Both sides close the connection after the exchange is complete.
+- You can see the diagram details in the ![Socket Diagram](./diagram_socket.png) file.
 
 
 # 💡Notes 
