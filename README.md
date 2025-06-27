@@ -133,7 +133,7 @@ I have prepared two diagrams(digram_serveur.jpeg et diagram_client.png) that exp
 # 💡Notes 
 
 * Make sure that both devices (client and server) are on the same network, and that the server IP is correctly set in the client code.
-* You can find all the wiring and connection details in the figure: cablage.png.
+* You can find all the wiring and connection details in the figure: ![cablage](./wiring_raspberry_sensors.png)
 * Sometimes, multiple parts of the program try to access a shared resource at the same time so to prevent conflicts and ensure data integrity, I used a mutex to protect these shared resources.
 * I launched parallel threads:
   - One thread periodically logs temperature and humidity data into a file.
